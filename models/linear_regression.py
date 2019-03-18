@@ -2,19 +2,19 @@ import numpy as np
 
 
 class LinearRegression:
+    """Linear Regression model. Models the relationship between some data and a
+    response assuming linear relationship and using ordinary least squares to
+    estimate the parameters.
 
+    Parameters
+    ----------
+    dims : `int`, optional
+        Number of features of the training data, without taking into
+        account the intercept. Defaults to None, leaving the model
+        unconstrained with respect to the number of features until the fit
+        method is called for the first time)
+    """
     def __init__(self, dims=None):
-        """Initialized the linear regression model
-
-        Parameters
-        ----------
-        dims : `int`, optional
-            Number of features of the training data, without taking into
-            account the intercept. Defaults to None, leaving the model
-            unconstrained with respect to the number of features until the fit
-            method is called for the first time)
-        """
-
         self.dims = dims
         self.w = None
         self.r2 = None
