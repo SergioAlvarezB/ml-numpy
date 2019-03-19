@@ -29,7 +29,7 @@ class LinearRegression:
             Independant variables of the training examples from which to
             estimate the parameters of the model.
 
-        y: `numpy.ndarray` (n_examples, n_features)
+        y : `numpy.ndarray` (n_examples, n_features)
             The response corresponding to each training example in ``x``.
 
         Returns
