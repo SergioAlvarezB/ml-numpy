@@ -2,7 +2,7 @@ import numpy as np
 
 
 class LinearRegression:
-    """Linear Regression model. Models the relationship between some data and a
+    """Linear Regression model. Models the relation between some data and a
     response assuming linear relationship and using ordinary least squares to
     estimate the parameters.
 
