@@ -14,6 +14,11 @@ class LogisticRegression:
 
     Classification model that maps a linear combination of the input features
     to a probability using the logistic function.
+
+    Parameters
+    ----------
+    n_features : `int`
+        Dimensionality, or number of features, of the training data.
     """
 
     def __init__(self, n_features):
@@ -21,7 +26,7 @@ class LogisticRegression:
         self.w = self.initialize_weights(self.n_features+1)
 
     def initialize_weights(self, n_features):
-        """Initialize weights from a uniform distribution in [-1/n, 1/n]."""
+        # Initialize weights from a uniform distribution in [-1/n, 1/n].
         return (np.random.rand(n_features)-0.5)*2.0/n_features
 
     def fit(self, x, y, learning_rate=1e-3, iterations=1000):
@@ -98,4 +103,5 @@ class LogisticRegression:
         return sigmoid(np.matmul(x, self.w))
 
     def loss(self, y, y_hat):
+        # Return loss to minimize by gradient descent.
         return -log_likelihood(y, y_hat)

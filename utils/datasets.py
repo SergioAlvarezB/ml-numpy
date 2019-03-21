@@ -1,3 +1,9 @@
+"""Collection of toy datasets.
+
+This modules provides an interface to load some toy datasets with the
+purpose of making notebooks and example scripts more readable.
+"""
+
 import numpy as np
 from sklearn.datasets import make_blobs
 
@@ -12,14 +18,14 @@ def toy_classification_dataset(features, classes, samples=100):
     ----------
 
     features : `int`
-        Number of dimensions of the input data
+        Number of dimensions of the input data.
 
     classes : `int`
         Size of the set of classes, e.g. classes=2 implies
-        binary classification
+        binary classification.
 
     samples : `int`, optional
-        Total number of samples to generate
+        Total number of samples to generate.
 
     """
 
