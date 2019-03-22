@@ -47,12 +47,13 @@ def plot_decision_boundary(predict, classes=2,
         plt.contourf(xx, yy, Z, levels=[0, 0.5, 1], cmap='jet', alpha=0.6)
 
     else:
-        Z = np.argmax(Z, axis=0)
+        if Z.ndim > 1:
+            Z = np.argmax(Z, axis=0)
         # Plot the contour and training examples
         Z = Z.reshape(xx.shape)
         plt.contourf(xx, yy, Z,
                      levels=np.arange(classes*2)/2,
-                     cmap=plt.cm.Spectral,
+                     cmap='jet',
                      alpha=0.6)
 
     return plt.gca()
