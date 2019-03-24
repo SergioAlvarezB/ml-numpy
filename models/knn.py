@@ -1,6 +1,6 @@
 import numpy as np
 from collections import Counter
-
+# # TODO: Comment all
 
 def similarity(x, X):
     xtiled = np.tile(np.reshape(x, [1, -1]), (X.shape[0], 1))
