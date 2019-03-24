@@ -44,3 +44,33 @@ def toy_classification_dataset(features, classes, samples=100):
     x_test, y_test = x[ix:], y[ix:]
 
     return (x_train, y_train), (x_test, y_test)
+
+
+def radial_classification_dataset(classes=2, samples=100, r_inc=1, noise=0.1):
+    # TODO: Comment
+
+    radius = np.arange(classes)/float(r_inc)
+
+    samples_pclass = samples//classes
+    samples = samples_pclass*classes
+    x = np.zeros([samples, 2])
+    y = np.zeros(samples)
+    for i, r in enumerate(radius):
+        # Simulate data in polar coordinates
+        e = np.random.randn(samples_pclass, 2)*noise
+        theta = np.random.rand(samples_pclass)*2*np.pi
+        curr_x = np.array([r*np.cos(theta), r*np.sin(theta)]).T + e
+        x[i*samples_pclass:(i+1)*samples_pclass, :] = curr_x
+        y[i*samples_pclass:(i+1)*samples_pclass] = i
+
+    # Split the data into training and test set
+    perm = np.random.permutation(samples)
+    x = x[perm]
+    y = y[perm]
+
+    ix = int(samples*0.8)
+
+    x_train, y_train = x[:ix], y[:ix]
+    x_test, y_test = x[ix:], y[ix:]
+
+    return (x_train, y_train), (x_test, y_test)
