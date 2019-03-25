@@ -8,8 +8,8 @@ import numpy as np
 from sklearn.datasets import make_blobs
 
 
-def toy_classification_dataset(features, classes, samples=100):
-    """Generates a vanilla clasffication dataset.
+def blobs_classification_dataset(features, classes, samples=100):
+    """Generates a vanilla classification dataset.
 
     A basic wrapper for the make_blobs dataset generator of sklearn:
     https://scikit-learn.org/stable/modules/generated

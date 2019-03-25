@@ -23,11 +23,11 @@ class LogisticRegression:
 
     def __init__(self, n_features):
         self.n_features = n_features
-        self.w = self.initialize_weights(self.n_features+1)
+        self.w = self._initialize_weights(self.n_features+1)
 
-    def initialize_weights(self, n_features):
+    def _initialize_weights(self, n_features):
         # Initialize weights from a uniform distribution in [-1/n, 1/n].
-        return (np.random.rand(n_features)-0.5)*2.0/n_features
+        return np.zeros(n_features)
 
     def fit(self, x, y, learning_rate=1e-3, iterations=1000):
         """Trains the model with gradient descent.
@@ -94,7 +94,6 @@ class LogisticRegression:
             Predicted probabilities for each data example
         """
 
-
         x = np.atleast_2d(x)
         x = np.reshape(x, [-1, self.n_features])
 
@@ -104,4 +103,4 @@ class LogisticRegression:
 
     def loss(self, y, y_hat):
         # Return loss to minimize by gradient descent.
-        return -log_likelihood(y, y_hat)
+        return -(1.0/len(y))*log_likelihood(y, y_hat)

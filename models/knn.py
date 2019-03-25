@@ -1,6 +1,6 @@
 import numpy as np
 from collections import Counter
-# # TODO: Comment all
+# # TODO: Comment all, check for model correctness
 
 def similarity(x, X):
     xtiled = np.tile(np.reshape(x, [1, -1]), (X.shape[0], 1))
@@ -8,9 +8,9 @@ def similarity(x, X):
     return distances
 
 
-class KNN:
-    """Non-parametric model that can be used either for classification or
-    regression.
+class KNNClassifier:
+    """Classifier version of the KNN. Non-parametric model that estimates the
+    label of a unseen point using its k-closests neighbors in the train set.
 
     """
 
