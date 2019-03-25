@@ -16,7 +16,6 @@ def blobs_classification_dataset(features, classes, samples=100):
 
     Parameters
     ----------
-
     features : `int`
         Number of dimensions of the input data.
 
@@ -26,6 +25,20 @@ def blobs_classification_dataset(features, classes, samples=100):
 
     samples : `int`, optional
         Total number of samples to generate.
+
+    Returns
+    -------
+    x_train : `numpy.ndarray` (0.8*samples, features)
+        Generated points belonging to the training set.
+
+    y_train : `numpy.ndarray` (0.8*samples,)
+        Labels corresponding to points in `x_train`.
+
+    x_test : `numpy.ndarray` (0.2*samples, features)
+        Generated points belonging to the test set.
+
+    y_train : `numpy.ndarray` (0.2*samples,)
+        Labels corresponding to points in `x_test`.
 
     """
 
@@ -47,7 +60,41 @@ def blobs_classification_dataset(features, classes, samples=100):
 
 
 def radial_classification_dataset(classes=2, samples=100, r_inc=1, noise=0.1):
-    # TODO: Comment
+    """Generates a 2D classification dataset.
+
+    Data is distributed along 0-centered circuferences. Each class falls within
+    a different radius from the center. The radius is increased with the
+    category number.
+
+    Parameters
+    ----------
+    classes : `int`, optional
+        Number of unique classes. Defaults to 2.
+
+    samples : `int`, optional
+        Total number of samples to generate.
+
+    r_inc : `float`, optional
+        Specifies the increment of radius between consecutive classes.
+
+    noise : `float`, optional
+        Standard deviation of the noise added to the samples.
+
+    Returns
+    -------
+    x_train : `numpy.ndarray` (0.8*samples, features)
+        Generated points belonging to the training set.
+
+    y_train : `numpy.ndarray` (0.8*samples,)
+        Labels corresponding to points in `x_train`.
+
+    x_test : `numpy.ndarray` (0.2*samples, features)
+        Generated points belonging to the test set.
+
+    y_train : `numpy.ndarray` (0.2*samples,)
+        Labels corresponding to points in `x_test`.
+
+    """
 
     radius = np.arange(classes)/float(r_inc)
 

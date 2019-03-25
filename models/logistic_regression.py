@@ -19,6 +19,7 @@ class LogisticRegression:
     ----------
     n_features : `int`
         Dimensionality, or number of features, of the training data.
+
     """
 
     def __init__(self, n_features):
@@ -50,7 +51,6 @@ class LogisticRegression:
 
         Returns
         -------
-
         loss : `list`
             List containing the loss on the training set at each iteration
 
@@ -92,6 +92,7 @@ class LogisticRegression:
         -------
         predicted : `numpy.ndarray` (n_examples,)
             Predicted probabilities for each data example
+
         """
 
         x = np.atleast_2d(x)

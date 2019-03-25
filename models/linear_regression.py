@@ -13,6 +13,7 @@ class LinearRegression:
         account the intercept. Defaults to None, leaving the model
         unconstrained with respect to the number of features until the fit
         method is called for the first time)
+
     """
     def __init__(self, dims=None):
         self.dims = dims
@@ -82,6 +83,7 @@ class LinearRegression:
         -------
         predicted : `numpy.ndarray` (n_examples,)
             Predicted values using the last computed weights
+
         """
 
         assert self.w is not None, "Unfitted predictor! Call the fit method."

@@ -11,7 +11,6 @@ def plot_decision_boundary(predict, classes=2,
 
     Parameters
     ----------
-
     predict : `Callable`
         Function that maps a numpy.nadarrar of shape (-1, 2) to a vector of
         probabilities os size classes if classes>2 or a single probability in
@@ -30,6 +29,7 @@ def plot_decision_boundary(predict, classes=2,
         Threshold used to determine whether the outputed probability belongs to
         class 1 in the case of binary classification. If classes>2 `th` is
         ignored. Defaults to 0.5.
+
     """
 
     # Generate a grid with 200 points in each dimension
