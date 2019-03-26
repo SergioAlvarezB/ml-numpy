@@ -19,12 +19,11 @@ class SVM:
         Defaults to 1.
 
     """
-    # TODO: Comment all class, add radial kernel
-    def __init__(self, kernel='linear', C=1, degree=2):
+    def __init__(self, kernel='linear', C=1, degree=2, gamma=1.0/4):
         self.C = C
-        self.kernel = self._get_kernel(kernel, degree)
+        self.kernel = self._get_kernel(kernel, degree, gamma)
 
-    def _get_kernel(self, kernel, degree):
+    def _get_kernel(self, kernel, degree, gamma):
         # return kernel as a Callable
         if kernel == 'linear':
             return kernels.linear
@@ -34,6 +33,9 @@ class SVM:
 
         if kernel == 'polynomial':
             return lambda x, y: kernels.polynomial(x, y, d=degree)
+
+        if kernel == 'rbf':
+            return lambda x, y: kernels.rbf(x, y, gamma=gamma)
 
     def fit(self, X, y, iterations=1000, learning_rate=0.01):
 
