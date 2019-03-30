@@ -37,6 +37,47 @@ class SVM:
         if kernel == 'rbf':
             return lambda x, y: kernels.rbf(x, y, gamma=gamma)
 
+    def _fit_analytic(self, X, y):
+        """Fits the lagr_multipliers with the analytic solution of the dual
+        form. THIS METHOD IS NOT CORRECT, although KKT conditions can be
+        enforced a posteriory, the solution is no longer guaranteed to be
+        optimal.
+        """
+        # Transform labels from format {0, 1} to {-1, 1}
+        y[y == 0] = -1
+
+        (n_samples, n_dimensions) = X.shape
+
+        # Compute kernel_matrix labeled
+        G = np.zeros([n_samples, n_samples])
+        for i in range(n_samples-1):
+            for j in range(i, n_samples):
+                G[i, j] = y[i]*y[j]*self.kernel(X[i, :], X[j, :])
+                G[j, i] = G[i, j]
+
+        # Compute analytic solution
+        lagr_multipliers = np.sum(np.linalg.pinv(G), axis=0)
+        lagr_multipliers = np.clip(lagr_multipliers, 0, self.C)
+
+        supported = lagr_multipliers > 0
+        self.lagr_multipliers = lagr_multipliers[supported]
+        self.supported_vectors = X[supported, :]
+        self.labels = y[supported]
+
+        # Compute intercept
+        bias = []
+        for i in range(len(self.labels)):
+            if self.lagr_multipliers[i] < self.C:
+                b = self.labels[i]
+                for j in range(len(self.labels)):
+                    if i != j:
+                        b -= (self.lagr_multipliers[j] * self.labels[j]
+                              * self.kernel(self.supported_vectors[j],
+                                            self.supported_vectors[i]))
+                bias.append(b)
+        self.b = np.mean(np.array(bias))
+
+
     def fit(self, X, y, iterations=1000, learning_rate=0.01):
 
         # Transform labels from format {0, 1} to {-1, 1}
