@@ -9,6 +9,10 @@ Split = namedtuple('Split', ['feature_ix', 'th', 'X_false', 'y_false',
 
 
 class TreeNode:
+    """DecisionTree Node. If split node, stores the feature index and the
+    value to make the decision, `th`. If represents a leaf then the attribute
+    `value` contains a distinct than None value.
+    """
     def __init__(self, value=None, feature_ix=None, th=None,
                  false_branch=None, true_branch=None):
         self.value = value
@@ -19,13 +23,39 @@ class TreeNode:
 
 
 class DecisionTree:
+    """Base class for a decision tree. To build a classification or regression
+    model the `_impurity_func` and the `_compute_leaf_value` methods must be
+    implemented at inheritance.
+
+    Parameters
+    ----------
+    min_split_samples : `int`, optional
+        Minimum number of samples at a node to perform a split. If the number
+        of samples is not enough then a leaf value is computed. Defaults to 2.
+
+    max_depth : `int`, optional
+        Maximum depth of the decision tree. If this value is reached then a
+        leaf value is computed for the node. Defaults to inf.
+
+    min_impurity : `float`, optional
+        Minimum improvement in impurity needed to make a split. If a split
+        does not reduce impurity by this much then a leaf value is computed.
+        Defaults to 1e-7.
+
+    p : `float`, optional
+        Proportion of the features to look at each split. Must be in the range
+        [0, 1]. Indicates the size of the subset of features, the sepecific
+        features are chosen randomly at each split.
+
+    """
 
     def __init__(self, min_split_samples=2, max_depth=float('inf'),
-                 min_impurity=1e-7):
+                 min_impurity=1e-7, p=1.0):
         self.root = None
         self.min_split_samples = min_split_samples
         self.max_depth = max_depth
         self.min_impurity = min_impurity
+        self.p = p
 
     def fit(self, X, y):
         self.root = self._build_tree(X, y, 1)
@@ -42,7 +72,10 @@ class DecisionTree:
             return TreeNode(value=value)
 
         impurity_redc = 0
-        for feature_ix in range(n_features):
+
+        # Feature bagging
+        features = np.random.permutation(n_features)[:int(self.p*n_features)]
+        for feature_ix in features:
             for th in np.unique(X[:, feature_ix]):
 
                 split = self._make_split(X, y, feature_ix, th)
@@ -125,6 +158,9 @@ class DecisionTree:
 
 
 class DecisionTreeClassifier(DecisionTree):
+    """Implements a decision tree classifier. Inherits from DecisionTree
+    implementing `_compute_leaf_value` and `_impurity_func`.
+    """
     def _compute_leaf_value(self, y):
         # Return the most apearing label
         labels, counts = np.unique(y, return_counts=True)
@@ -143,6 +179,9 @@ class DecisionTreeClassifier(DecisionTree):
 
 
 class DecisionTreeRegressor(DecisionTree):
+    """Implements a decision tree based regression model. Inherits from
+    DecisionTree implementing `_compute_leaf_value` and `_impurity_func`.
+    """
     def _compute_leaf_value(self, y):
         # Return the mean value
         return np.mean(y)
