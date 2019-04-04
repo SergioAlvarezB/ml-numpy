@@ -98,7 +98,7 @@ class GradientBoostingRegressor:
     """
 
     def __init__(self, base_model, learning_rate=0.5, max_models=100,
-                 min_rmse=0.1):
+                 min_rmse=1e-7):
         self.base_model = base_model
         self.learning_rate = learning_rate
         self.max_models = max_models
