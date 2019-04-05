@@ -21,39 +21,39 @@ class LinearRegression:
         self.r2 = None
         self.std_err = None
 
-    def fit(self, x, y):
-        """Fits x data using ordinary least squares method.
+    def fit(self, X, y):
+        """Fits X data using ordinary least squares method.
 
         Parameters
         ----------
-        x : `numpy.ndarray` (n_examples, n_features)
-            Independant variables of the training examples from which to
+        X : `numpy.ndarray` (n_samples, n_features)
+            Training examples from which to
             estimate the parameters of the model.
 
-        y : `numpy.ndarray` (n_examples, n_features)
+        y : `numpy.ndarray` (n_samples, n_features)
             The response corresponding to each training example in ``x``.
 
         Returns
         -------
-        weights : `numpy.ndarray` (n_features+1,)
+        weights : `numpy.array` (n_features+1,)
             The estimated of the model parameters given ``x`` and ``y``
 
         """
 
         # If dims setted check for compatibility, if not initialize dims
         if self.dims is not None:
-            assert x.shape[1] == self.dims, "Number of dimensions mismatch."
+            assert X.shape[1] == self.dims, "Number of dimensions mismatch."
         else:
-            self.dims = x.shape[1]
+            self.dims = X.shape[1]
 
         # Add a first dimension of ones corresponding to the intercept
-        x = np.hstack((np.ones([x.shape[0], 1]), x))
-        pseudo_inv = np.matmul(np.linalg.pinv(np.matmul(x.T, x)), x.T)
+        X = np.hstack((np.ones([X.shape[0], 1]), X))
+        pseudo_inv = np.matmul(np.linalg.pinv(np.matmul(X.T, X)), X.T)
         self.w = np.matmul(pseudo_inv, y)
 
         # Compute fitness metrics
-        self._compute_r2(x, y)
-        self._estimate_standard_error(x, y)
+        self._compute_r2(X, y)
+        self._estimate_standard_error(X, y)
 
         return self.w
 
@@ -76,13 +76,13 @@ class LinearRegression:
 
         Parameters
         ----------
-        x : `numpy.ndarray` (n_examples, n_features)
-            Data from where to infer a prediction
+        x : `numpy.ndarray` (n_examples, n_features))
+            New data to predict.
 
         Returns
         -------
         predicted : `numpy.ndarray` (n_examples,)
-            Predicted values using the last computed weights
+            Predicted values using the last computed weights.
 
         """
 
