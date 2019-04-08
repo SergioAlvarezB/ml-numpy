@@ -22,7 +22,7 @@ class KMeans:
         self.max_iter = max_iter
         self.centroids = None
 
-    def fit(self, X, re_init=True, verbose=True):
+    def fit(self, X, re_init=True, verbose=False):
         """Fits `self.k` clusters to the data `X`.
 
         Parameters
@@ -64,6 +64,8 @@ class KMeans:
         clusters : `numpy.array` (n_samples,)
             A label for each sample in `x` indicating the assigned cluster.
         """
+        if self.centroids is None:
+            raise ValueError('The model has not been fitted to any data yet!')
 
         return self._clusterize(x, score)
 
@@ -86,7 +88,7 @@ class KMeans:
         clusters = np.argmin(dists, axis=1)
 
         if score:
-            score = sum([1.0/n*np.sum(dists[clusters == c, c])
+            score = sum([1.0/(2*n)*np.sum(dists[clusters == c, c])
                          for c, n in Counter(clusters).most_common()])
             return clusters, score
 
@@ -101,3 +103,12 @@ class KMeans:
             centroids[k] = np.mean(cluster, axis=0)
 
         return centroids
+
+    def _inner_variances(self, X, clusters):
+        self._variances = []]
+        for k in self.k:
+            diff = X[clusters==k, :]-self._centroids[k]
+            # TODO: compute properly variance
+            self._variances.append(np.matmul(diff.T, diff))
+
+        return self._variances
