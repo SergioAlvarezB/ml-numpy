@@ -48,7 +48,7 @@ def plot_decision_boundary(predict, classes=2,
 
     else:
         if Z.ndim > 1:
-            Z = np.argmax(Z, axis=0)
+            Z = np.argmax(Z, axis=1)
         # Plot the contour and training examples
         Z = Z.reshape(xx.shape)
         plt.contourf(xx, yy, Z,

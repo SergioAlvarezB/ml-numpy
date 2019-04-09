@@ -105,10 +105,18 @@ class KMeans:
         return centroids
 
     def _inner_variances(self, X, clusters):
-        self._variances = []]
-        for k in self.k:
-            diff = X[clusters==k, :]-self._centroids[k]
-            # TODO: compute properly variance
-            self._variances.append(np.matmul(diff.T, diff))
+        covariances = []
+        for k in range(self.k):
+            diff = X[clusters == k, :] - self.centroids[k]
+            covariances.append(np.matmul(diff.T, diff))
 
-        return self._variances
+        return covariances
+
+    def _init_gmm(self, X):
+        # Returns centroids and covariance matrices
+        self.fit(X)
+        clusters = self.predict(X)
+
+        self.covariances = self._inner_variances(X, clusters)
+
+        return self.centroids, self.covariances
