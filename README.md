@@ -60,7 +60,7 @@ Please feel free to contact me if you have any suggestions or you have detected
 a wrong implementation!
 
 ## License
-**[MIT license](./LICENSE.md)**
+**[MIT license](https://opensource.org/licenses/mit-license.php)**
 
 ## Acknowledgments
 
