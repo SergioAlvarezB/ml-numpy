@@ -51,12 +51,12 @@ class KMeans:
 
             self.centroids = new_centroids
 
-    def predict(self, x, score=False):
+    def predict(self, X, score=False):
         """Assign each sample to a cluster.
 
         Parameters
         ----------
-        x : `numpy.ndarray` (n_samples, n_features)
+        X : `numpy.ndarray` (n_samples, n_features)
             New data to predict
 
         Returns
@@ -67,7 +67,7 @@ class KMeans:
         if self.centroids is None:
             raise ValueError('The model has not been fitted to any data yet!')
 
-        return self._clusterize(x, score)
+        return self._clusterize(X, score)
 
     def _init_centroids(self, X):
         # Randomly choose k samples from the data as centroids

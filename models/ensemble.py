@@ -27,7 +27,7 @@ class Bagging:
         self.models = [self._fit_model(copy.deepcopy(self.base_model), X, y)
                        for _ in range(self.n_models)]
 
-    def predict(self, x):
+    def predict(self, X):
         raise NotImplementedError
 
     def _fit_model(self, model, X, y):
@@ -49,11 +49,11 @@ class BaggingClassifier(Bagging):
     the most voted label among all the predictors.
     """
 
-    def predict(self, x):
-        n_samples = x.shape[0]
+    def predict(self, X):
+        n_samples = X.shape[0]
         predictions = np.zeros((n_samples, self.n_models))
         for i in range(self.n_models):
-            predictions[:, i] = self.models[i].predict(x)
+            predictions[:, i] = self.models[i].predict(X)
 
         predictions = np.apply_along_axis(lambda x: np.bincount(x).argmax(),
                                           1, predictions)
@@ -65,11 +65,11 @@ class BaggingRegressor(Bagging):
     the mean output among all the predictors outputs.
     """
 
-    def predict(self, x):
-        n_samples = x.shape[0]
+    def predict(self, X):
+        n_samples = X.shape[0]
         predictions = np.zeros((n_samples, self.n_models))
         for i in range(self.n_models):
-            predictions[:, i] = self.models[i].predict(x)
+            predictions[:, i] = self.models[i].predict(X)
 
         predictions = np.mean(predictions, axis=1)
         return predictions
@@ -127,10 +127,10 @@ class GradientBoostingRegressor:
 
             curr_rmse = new_rmse
 
-    def predict(self, x):
-        predictions = self.initial_model.predict(x)
+    def predict(self, X):
+        predictions = self.initial_model.predict(X)
 
         for model in self.models:
-            predictions += self.learning_rate*model.predict(x)
+            predictions += self.learning_rate*model.predict(X)
 
         return predictions

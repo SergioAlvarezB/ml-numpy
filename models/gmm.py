@@ -60,8 +60,8 @@ class GMM:
                 break
             prev_h = h
 
-    def predict(self, x):
-        return self._expectation_step(x)
+    def predict(self, X):
+        return self._expectation_step(X)
 
     def _expectation_step(self, X):
         (n_samples, n_features) = X.shape

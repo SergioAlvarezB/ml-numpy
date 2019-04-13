@@ -77,7 +77,6 @@ class SVM:
                 bias.append(b)
         self.b = np.mean(np.array(bias))
 
-
     def fit(self, X, y, iterations=1000, learning_rate=0.01):
 
         # Transform labels from format {0, 1} to {-1, 1}
@@ -139,10 +138,10 @@ class SVM:
         K = np.array([self.kernel(xi, x) for xi in self.supported_vectors])
         return (np.sum(self.lagr_multipliers*self.labels*K) + self.b) > 0
 
-    def predict(self, x):
-        x = np.atleast_2d(x)
-        y_hat = np.zeros(x.shape[0])
+    def predict(self, X):
+        X = np.atleast_2d(X)
+        y_hat = np.zeros(X.shape[0])
         for i in range(len(y_hat)):
-            y_hat[i] = self._predict_single(x[i, :])
+            y_hat[i] = self._predict_single(X[i, :])
 
         return y_hat

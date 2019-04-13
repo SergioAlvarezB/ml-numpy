@@ -71,12 +71,12 @@ class LinearRegression:
         y_pred = np.matmul(x, self.w)
         self.std_err = np.sqrt(np.sum((y_pred-y)**2)/(x.shape[0]-2))
 
-    def predict(self, x):
+    def predict(self, X):
         """Predicts the response using the current estimands.
 
         Parameters
         ----------
-        x : `numpy.ndarray` (n_examples, n_features))
+        X : `numpy.ndarray` (n_examples, n_features))
             New data to predict.
 
         Returns
@@ -88,10 +88,10 @@ class LinearRegression:
 
         assert self.w is not None, "Unfitted predictor! Call the fit method."
 
-        x = np.atleast_2d(x)
-        assert x.shape[1] == self.dims, "Number of dimensions mismatch."
+        X = np.atleast_2d(X)
+        assert X.shape[1] == self.dims, "Number of dimensions mismatch."
 
         # Add a first dimension of ones corresponding to the intercept
-        x = np.hstack((np.ones([x.shape[0], 1]), x))
+        X = np.hstack((np.ones([X.shape[0], 1]), X))
 
-        return np.matmul(x, self.w)
+        return np.matmul(X, self.w)

@@ -61,12 +61,12 @@ class KNNClassifier(KNNBase):
 
         return y_hat
 
-    def predict(self, x):
-        x = np.atleast_2d(x)
-        x = np.reshape(x, [-1, self.X.shape[1]])
-        y_hat = np.zeros(x.shape[0])
+    def predict(self, X):
+        X = np.atleast_2d(X)
+        X = np.reshape(X, [-1, self.X.shape[1]])
+        y_hat = np.zeros(X.shape[0])
         for i in range(len(y_hat)):
-            y_hat[i] = self._predict_single(x[i, :])
+            y_hat[i] = self._predict_single(X[i, :])
 
         return y_hat
 
@@ -84,11 +84,11 @@ class KNNRegressor(KNNBase):
 
         return y_hat
 
-    def predict(self, x):
-        x = np.atleast_2d(x)
-        x = np.reshape(x, [-1, self.X.shape[1]])
-        y_hat = np.zeros(x.shape[0])
+    def predict(self, X):
+        X = np.atleast_2d(X)
+        X = np.reshape(X, [-1, self.X.shape[1]])
+        y_hat = np.zeros(X.shape[0])
         for i in range(len(y_hat)):
-            y_hat[i] = self._predict_single(x[i, :])
+            y_hat[i] = self._predict_single(X[i, :])
 
         return y_hat

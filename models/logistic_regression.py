@@ -80,12 +80,12 @@ class LogisticRegression:
 
         return loss, acc
 
-    def predict(self, x):
+    def predict(self, X):
         """Predicts the response using the current estimands.
 
         Parameters
         ----------
-        x : `numpy.ndarray` (n_examples, n_features)
+        X : `numpy.ndarray` (n_examples, n_features)
             Data from where to infer a prediction
 
         Returns
@@ -95,12 +95,12 @@ class LogisticRegression:
 
         """
 
-        x = np.atleast_2d(x)
-        x = np.reshape(x, [-1, self.n_features])
+        X = np.atleast_2d(X)
+        X = np.reshape(X, [-1, self.n_features])
 
         # Add a first dimension of ones corresponding to the intercept
-        x = np.hstack((np.ones([x.shape[0], 1]), x))
-        return sigmoid(np.matmul(x, self.w))
+        X = np.hstack((np.ones([X.shape[0], 1]), X))
+        return sigmoid(np.matmul(X, self.w))
 
     def loss(self, y, y_hat):
         # Return loss to minimize by gradient descent.
