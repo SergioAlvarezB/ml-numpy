@@ -2,6 +2,8 @@ import numpy as np
 import copy
 from multiprocessing.dummy import Pool
 
+from models.dummy import DummyRegressor
+
 
 class Bagging:
     """Bagging base class. Implements common methods to classification and
@@ -75,10 +77,41 @@ class BaggingRegressor(Bagging):
         return predictions
 
 
-class GradientBoostingRegressor:
-    """Implements gradient bossting meta-algorithm for regression. At each
-    training step trains a new estimator, a copy of `base_model` to predict the
-    residuals of the current model the adds the estimator to the current model.
+class GradientBoosting:
+    """Implements gradient bossting meta-algorithm.
+    At each training step trains a new estimator, a copy of `base_model`,
+    to predict the residuals of the current model, in the regression task,
+    or a scaled version of the gradient of the logistic function, in the
+    case of classification. Then the estimator to the current model.
+
+    Parameters
+    ----------
+    base_model : `object`
+        Initialized model to replicate.
+
+    learning_rate : `float`, optional
+        Factor by which to multiply the prediction of each new estimator added
+        to the model. Defaults to 0.5.
+
+    max_models : `int`, optional
+        Maximum number of estimators to add to the model. Defaults to 100.
+    """
+
+    def __init__(self, base_model, learning_rate=0.5, max_models=100):
+        self.base_model = base_model
+        self.learning_rate = learning_rate
+        self.max_models = max_models
+
+    def fit(self, X, y):
+        raise NotImplementedError
+
+    def predict(self, X):
+        raise NotImplementedError
+
+
+class GradientBoostingRegressor(GradientBoosting):
+    """Implements methods to train gradient boosting meta-model
+    for regression.
 
     Parameters
     ----------
@@ -99,14 +132,11 @@ class GradientBoostingRegressor:
 
     def __init__(self, base_model, learning_rate=0.5, max_models=100,
                  min_rmse=1e-7):
-        self.base_model = base_model
-        self.learning_rate = learning_rate
-        self.max_models = max_models
+        super().__init__(base_model, learning_rate, max_models)
         self.min_rmse = min_rmse
 
     def fit(self, X, y):
-        self.initial_model = copy.deepcopy(self.base_model)
-        self.initial_model.fit(X, y)
+        self.initial_model = DummyRegressor(y)
         residuals = y-self.initial_model.predict(X)
         self.models = []
 
@@ -134,3 +164,68 @@ class GradientBoostingRegressor:
             predictions += self.learning_rate*model.predict(X)
 
         return predictions
+
+
+class GradientBoostingClassifier(GradientBoosting):
+    """Implements methods to train gradient boosting meta-model
+    for classification.
+    """
+
+    def __init__(self, base_model, learning_rate=0.5, max_models=100):
+        super().__init__(base_model, learning_rate, max_models)
+        self.update_steps = []
+
+    def _loss(self, y, preds):
+        return -(y*np.log(preds) + (1-y)*np.log(1-preds))
+
+    def fit(self, X, y):
+        self.initial_model = DummyRegressor(y, classification=True)
+
+        for i in range(self.max_models):
+            probs = self.predict_proba(X)
+            grads = (1-probs)*(y + y-1)
+
+            loss = self._loss(y, probs)
+
+            new_model = copy.deepcopy(self.base_model)
+            new_model.fit(grads)
+
+            # Estimate update step
+            logits = self.predict_logits(X)
+            rho = 0  # Update step
+            preds = new_model.predict(X)
+            probs = sigmoid(logits + rho*preds)
+            while True:
+                descent_dir = (1-probs)*(y + y-1)*preds
+
+                probs = sigmoid(logits + (rho + 0.01*descent_dir)*preds)
+                new_loss = self._loss(y, probs)
+                if new_loss >= loss:
+                    break
+                else:
+                    rho += 0.01*descent_dir
+                    loss = new_loss
+
+            self.models.append(new_model)
+            self.update_steps.append(rho)
+
+    def predict_logits(self, X):
+        predictions = self.initial_model.predict(X)
+
+        for i, model in enumerate(self.models):
+            coef = self.learning_rate*self.update_steps[i]
+            predictions += coef*model.predict(X)
+
+        return predictions
+
+    def predict_proba(self, X):
+        predictions = self.predict_logits(X)
+        # Logistic function.
+        return sigmoid(-predictions)
+
+    def predict(self, X):
+        return np.round(self.predict_proba(X))
+
+
+def sigmoid(z):
+    return 1. / (1. + np.exp(-z))
