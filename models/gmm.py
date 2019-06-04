@@ -45,7 +45,7 @@ class GMM:
         """
 
         # Initialize gaussians
-        if re_init or self.weights is None:
+        if re_init or (self.weights is None):
             self._init_gaussians(X)
 
         prev_h = None
@@ -55,7 +55,8 @@ class GMM:
 
             # Maximization
             self._maximization_step(X, h)
-            if prev_h is not None and np.linalg.norm(h-prev_h) < self.th:
+            if (prev_h is not None
+                and np.linalg.norm(h-prev_h) < self.th):
                 # Converged
                 break
             prev_h = h
@@ -68,9 +69,11 @@ class GMM:
         # Computes likelihood for each sample of each gaussian
         h = np.zeros((n_samples, self.k))
         for k in range(self.k):
-            h[:, k] = self._multinomial_gaussian(X,
-                                                 self.means[k],
-                                                 self.covariances[k])
+            h[:, k] = self._multinomial_gaussian(
+                    X,
+                    self.means[k],
+                    self.covariances[k])
+
             h[:, k] *= self.weights[k]
 
         h = h/np.sum(h, axis=1, keepdims=True)
@@ -86,17 +89,17 @@ class GMM:
         for k in range(self.k):
             h_sum = np.sum(h[:, k])
             self.means[k] = np.sum(h[:, k, None]*X, axis=0)/h_sum
-            # TODO: compute properly variance
+
             diff = (X-self.means[k])
             self.covariances[k] = np.matmul(diff.T, h[:, k, None]*diff)/h_sum
 
     def _multinomial_gaussian(self, x, mean, variance):
-        factor = 1./np.sqrt(np.linalg.det(variance)*(2*np.pi)**self.k)
-        diff = x-mean
+        factor = 1./np.sqrt(np.linalg.det(variance) * (2*np.pi) ** self.k)
+        diff = x - mean
         inv_var = np.linalg.pinv(variance)
-        exp = np.exp(-0.5*np.sum((diff @ inv_var) * diff, axis=1))
+        exp = np.exp(-0.5 * np.sum((diff @ inv_var) * diff, axis=1))
 
-        return factor*exp
+        return factor * exp
 
     def _init_gaussians(self, X):
 

@@ -25,7 +25,7 @@ class Bagging:
         self.n_models = n_models
 
     def fit(self, X, y):
-
+        # Fit `n_models` independantly.
         self.models = [self._fit_model(copy.deepcopy(self.base_model), X, y)
                        for _ in range(self.n_models)]
 
@@ -33,16 +33,14 @@ class Bagging:
         raise NotImplementedError
 
     def _fit_model(self, model, X, y):
+        n_samples, n_features = X.shape
 
-        (n_samples, n_features) = X.shape
-
-        # Bootstrap
+        # Bootstrap.
         boots_ix = np.random.choice(n_samples, size=n_samples)
         x_train = X[boots_ix, :]
         y_train = y[boots_ix]
 
         model.fit(x_train, y_train)
-
         return model
 
 
@@ -57,8 +55,11 @@ class BaggingClassifier(Bagging):
         for i in range(self.n_models):
             predictions[:, i] = self.models[i].predict(X)
 
-        predictions = np.apply_along_axis(lambda x: np.bincount(x).argmax(),
-                                          1, predictions)
+        predictions = np.apply_along_axis(
+                lambda x: np.bincount(x).argmax(),
+                axis=1,
+                arr=predictions)
+
         return predictions
 
 
@@ -130,8 +131,12 @@ class GradientBoostingRegressor(GradientBoosting):
         models.
     """
 
-    def __init__(self, base_model, learning_rate=0.5, max_models=100,
+    def __init__(self,
+                 base_model,
+                 learning_rate=0.5,
+                 max_models=100,
                  min_rmse=1e-7):
+        # Initialize with parent class method.
         super().__init__(base_model, learning_rate, max_models)
         self.min_rmse = min_rmse
 
@@ -153,8 +158,8 @@ class GradientBoostingRegressor(GradientBoosting):
             residuals = y-self.predict(X)
 
             new_rmse = np.mean(np.square(residuals))
-            rmse_improv = curr_rmse - new_rmse
 
+            rmse_improv = curr_rmse - new_rmse
             curr_rmse = new_rmse
 
     def predict(self, X):
@@ -169,10 +174,32 @@ class GradientBoostingRegressor(GradientBoosting):
 class GradientBoostingClassifier(GradientBoosting):
     """Implements methods to train gradient boosting meta-model
     for classification.
+
+    Parameters
+    ----------
+    base_model : `object`
+        Initialized model to replicate.
+
+    learning_rate : `float`, optional
+        Factor by which to multiply the prediction of each
+        new estimator added to the model. Defaults to 0.5.
+
+    max_models : `int`, optional
+        Maximum number of estimators to add to the model.
+        Defaults to 100.
+
+    min_loss : `float`, optional
+        Threshold of minimum loss improvement needed to continue training
+        models. Otherwise the training is considered to have converged.
     """
 
-    def __init__(self, base_model, learning_rate=0.5, max_models=100):
+    def __init__(self,
+                 base_model,
+                 learning_rate=0.5,
+                 max_models=100,
+                 min_loss=1e-5):
         super().__init__(base_model, learning_rate, max_models)
+        self.min_loss = min_loss
         self.update_steps = []
 
     def _loss(self, y, preds):
@@ -195,6 +222,9 @@ class GradientBoostingClassifier(GradientBoosting):
             rho = 0  # Update step
             preds = new_model.predict(X)
             probs = sigmoid(logits + rho*preds)
+
+            prev_loss = loss
+
             while True:
                 descent_dir = (1-probs)*(y + y-1)*preds
 
@@ -208,6 +238,10 @@ class GradientBoostingClassifier(GradientBoosting):
 
             self.models.append(new_model)
             self.update_steps.append(rho)
+
+            if loss + self.min_loss <= prev_loss:
+                # Converged
+                break
 
     def predict_logits(self, X):
         predictions = self.initial_model.predict(X)

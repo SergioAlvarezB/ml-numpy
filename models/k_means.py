@@ -73,14 +73,17 @@ class KMeans:
         # Randomly choose k samples from the data as centroids
         (n_samples, n_features) = X.shape
 
-        centroids_ix = np.random.choice(n_samples, size=self.k, replace=False)
+        centroids_ix = np.random.choice(
+                n_samples,
+                size=self.k,
+                replace=False)
 
         self.centroids = X[centroids_ix, :]
 
     def _clusterize(self, X, score=False):
         # Assign a cluster to each sample, computes score as the sum of the
         # inner sum of squares of each cluster
-        (n_samples, n_fetures) = X.shape
+        n_samples, n_fetures = X.shape
         dists = np.zeros((n_samples, self.k))
         for k in range(self.k):
             dists[:, k] = np.sum(np.square(X-self.centroids[k, :]), axis=1)
@@ -96,7 +99,7 @@ class KMeans:
 
     def _compute_centroids(self, X, clusters):
         # Compute each new centroid as the mean of its cluster
-        (n_samples, n_features) = X.shape
+        n_samples, n_features = X.shape
         centroids = np.zeros((self.k, n_features))
         for k in range(self.k):
             cluster = X[clusters == k, :]

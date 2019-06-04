@@ -42,9 +42,10 @@ def blobs_classification_dataset(features, classes, samples=100):
 
     """
 
-    x, y = make_blobs(n_samples=samples,
-                      n_features=features,
-                      centers=classes)
+    x, y = make_blobs(
+            n_samples=samples,
+            n_features=features,
+            centers=classes)
 
     # Split the data into training and test set
     perm = np.random.permutation(samples)
@@ -106,7 +107,9 @@ def radial_classification_dataset(classes=2, samples=100, r_inc=1, noise=0.1):
         # Simulate data in polar coordinates
         e = np.random.randn(samples_pclass, 2)*noise
         theta = np.random.rand(samples_pclass)*2*np.pi
+
         curr_x = np.array([r*np.cos(theta), r*np.sin(theta)]).T + e
+
         x[i*samples_pclass:(i+1)*samples_pclass, :] = curr_x
         y[i*samples_pclass:(i+1)*samples_pclass] = i
 
@@ -123,7 +126,10 @@ def radial_classification_dataset(classes=2, samples=100, r_inc=1, noise=0.1):
     return (x_train, y_train), (x_test, y_test)
 
 
-def spiral_classification_dataset(classes=2, samples=100, r_inc=1, noise=0.1,
+def spiral_classification_dataset(classes=2,
+                                  samples=100,
+                                  r_inc=1,
+                                  noise=0.1,
                                   radius=2):
     """Generates a 2D classification dataset.
 
@@ -165,19 +171,22 @@ def spiral_classification_dataset(classes=2, samples=100, r_inc=1, noise=0.1,
     offsets = np.arange(classes)/classes * 2*np.pi
     samples_pclass = samples//classes
     revs = float(radius)/r_inc
-    r = np.arange(samples_pclass)/float(samples_pclass)*radius
-    theta = np.arange(samples_pclass)/float(samples_pclass)*2*np.pi*revs
+    r = np.arange(samples_pclass)/float(samples_pclass) * radius
+    theta = np.arange(samples_pclass)/float(samples_pclass) * 2*np.pi * revs
 
     # Total samples will be a multiple of number of classes so each class
     # is evenly sampled
     samples = samples_pclass*classes
     x = np.zeros([samples, 2])
     y = np.zeros(samples)
+
     for i in range(classes):
         # Simulate data in polar coordinates
         e = np.random.randn(samples_pclass, 2)*noise*np.array([r, r]).T
+
         curr_x = np.array([r*np.cos(theta + offsets[i]),
                            r*np.sin(theta + offsets[i])]).T + e
+
         x[i*samples_pclass:(i+1)*samples_pclass, :] = curr_x
         y[i*samples_pclass:(i+1)*samples_pclass] = i
 

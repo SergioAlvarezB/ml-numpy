@@ -29,14 +29,17 @@ class SVM:
         if kernel == 'linear':
             return kernels.linear
 
-        if kernel == 'quadratic':
+        elif kernel == 'quadratic':
             return lambda x, y: kernels.polynomial(x, y, d=2)
 
-        if kernel == 'polynomial':
+        elif kernel == 'polynomial':
             return lambda x, y: kernels.polynomial(x, y, d=degree)
 
-        if kernel == 'rbf':
+        elif kernel == 'rbf':
             return lambda x, y: kernels.rbf(x, y, gamma=gamma)
+
+        else:
+            raise NotImplemented
 
     def _fit_analytic(self, X, y):
         """Fits the lagr_multipliers with the analytic solution of the dual
@@ -47,10 +50,11 @@ class SVM:
         # Transform labels from format {0, 1} to {-1, 1}
         y[y == 0] = -1
 
-        (n_samples, n_dimensions) = X.shape
+        n_samples, n_dimensions = X.shape
 
         # Compute kernel_matrix labeled
         G = np.zeros([n_samples, n_samples])
+
         for i in range(n_samples-1):
             for j in range(i, n_samples):
                 G[i, j] = y[i]*y[j]*self.kernel(X[i, :], X[j, :])
@@ -68,13 +72,14 @@ class SVM:
         # Compute intercept
         bias = []
         for i in range(len(self.labels)):
+
             if self.lagr_multipliers[i] < self.C:
                 b = self.labels[i]
                 for j in range(len(self.labels)):
                     if i != j:
-                        b -= (self.lagr_multipliers[j] * self.labels[j]
-                              * self.kernel(self.supported_vectors[j],
-                                            self.supported_vectors[i]))
+                        k = self.kernel(self.supported_vectors[j],
+                                        self.supported_vectors[i])
+                        b -= self.lagr_multipliers[j] * self.labels[j] * k
                 bias.append(b)
         self.b = np.mean(np.array(bias))
 
@@ -83,13 +88,14 @@ class SVM:
         # Transform labels from format {0, 1} to {-1, 1}
         y[y == 0] = -1
 
-        (n_samples, n_dimensions) = X.shape
+        n_samples, n_dimensions = X.shape
 
         # Initialize lagrange multipliers
         lagr_multipliers = np.random.rand(n_samples)/n_samples
 
         # Compute kernel_matrix labeled
         G = np.zeros([n_samples, n_samples])
+
         for i in range(n_samples-1):
             for j in range(i, n_samples):
                 G[i, j] = y[i]*y[j]*self.kernel(X[i, :], X[j, :])
@@ -98,18 +104,20 @@ class SVM:
         # Projected gradient descent
         loss = []
         for i in range(iterations):
-            # Gradient of the dual form with respect to lagrange multipliers
+            # Gradient of the dual form with respect to lagrange multipliers.
             dl = np.dot(lagr_multipliers, G) - 1
 
-            # Update lagrange multipliers
+            # Update lagrange multipliers.
             lagr_multipliers -= (1/n_samples)*learning_rate*dl
 
-            # Project update to satisfy constrains
+            # Project update to satisfy constrains.
             lagr_multipliers = np.clip(lagr_multipliers, 0, self.C)
 
-            # Compute loss
+            # Compute loss.
             loss.append(self.loss(lagr_multipliers, G))
 
+        # Only vectors with multipler greater than 0 contibute
+        # to the margin.
         supported = lagr_multipliers > 1e-7
         self.lagr_multipliers = lagr_multipliers[supported]
         self.supported_vectors = X[supported, :]
@@ -122,22 +130,25 @@ class SVM:
                 b = self.labels[i]
                 for j in range(len(self.labels)):
                     if i != j:
-                        b -= (self.lagr_multipliers[j] * self.labels[j]
-                              * self.kernel(self.supported_vectors[j],
-                                            self.supported_vectors[i]))
-                bias.append(b)
-        self.b = np.mean(np.array(bias))
+                        k = self.kernel(self.supported_vectors[j],
+                                        self.supported_vectors[i])
+                        b -= self.lagr_multipliers[j] * self.labels[j] *k
 
+                bias.append(b)
+
+        self.b = np.mean(np.array(bias))
         return loss
 
     def loss(self, lagr_multipliers, G):
         # Return dual form cost function
-        return 0.5*(np.dot(np.dot(lagr_multipliers, G), lagr_multipliers)
-                    - np.sum(lagr_multipliers))
+
+        target = np.dot(np.dot(lagr_multipliers, G), lagr_multipliers)
+        constraint = np.sum(lagr_multipliers)
+        return 0.5 * (target - constraint)
 
     def _predict_single(self, x):
         K = np.array([self.kernel(xi, x) for xi in self.supported_vectors])
-        return (np.sum(self.lagr_multipliers*self.labels*K) + self.b) > 0
+        return (np.sum(self.lagr_multipliers * self.labels * K) + self.b) > 0
 
     def predict(self, X):
         X = np.atleast_2d(X)

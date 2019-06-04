@@ -6,14 +6,14 @@ def sigmoid(z):
 
 
 def log_likelihood(y, y_hat):
-    return np.sum(y*np.log(y_hat) + (1-y)*np.log(1-y_hat))
+    return np.sum(y * np.log(y_hat) + (1-y) * np.log(1-y_hat))
 
 
 class LogisticRegression:
     """Classification model based on the logistic function.
 
-    Classification model that maps a linear combination of the input features
-    to a probability using the logistic function.
+    Classification model that maps a linear combination of the
+    input features to a probability using the logistic function.
 
     Parameters
     ----------
@@ -27,7 +27,6 @@ class LogisticRegression:
         self.w = self._initialize_weights(self.n_features+1)
 
     def _initialize_weights(self, n_features):
-        # Initialize weights from a uniform distribution in [-1/n, 1/n].
         return np.zeros(n_features)
 
     def fit(self, x, y, learning_rate=1e-3, iterations=1000):

@@ -2,8 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_decision_boundary(predict, classes=2,
-                           x_range=[0, 1], y_range=[0, 1], th=0.5):
+def plot_decision_boundary(predict,
+                           classes=2,
+                           x_range=[0, 1],
+                           y_range=[0, 1],
+                           th=0.5):
     """Plots decision boundary on 2D.
 
     Creates a 2Dplot of size defined by `x_range` and `y_range`, and shadows
@@ -44,7 +47,10 @@ def plot_decision_boundary(predict, classes=2,
         Z = Z > th
         # Plot the contour and training examples
         Z = np.reshape(Z, xx.shape)
-        plt.contourf(xx, yy, Z, levels=[0, 0.5, 1], cmap='jet', alpha=0.6)
+        plt.contourf(xx, yy, Z,
+                levels=[0, 0.5, 1],
+                cmap='jet',
+                alpha=0.6)
 
     else:
         if Z.ndim > 1:
@@ -52,8 +58,8 @@ def plot_decision_boundary(predict, classes=2,
         # Plot the contour and training examples
         Z = Z.reshape(xx.shape)
         plt.contourf(xx, yy, Z,
-                     levels=np.arange(classes*2)/2,
-                     cmap='jet',
-                     alpha=0.6)
+                levels=np.arange(classes*2)/2,
+                cmap='jet',
+                alpha=0.6)
 
     return plt.gca()
