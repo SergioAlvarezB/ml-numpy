@@ -29,7 +29,7 @@ class LogisticRegression:
     def _initialize_weights(self, n_features):
         return np.zeros(n_features)
 
-    def fit(self, x, y, learning_rate=1e-3, iterations=1000):
+    def fit(self, X, y, learning_rate=1e-3, iterations=1000):
         """Trains the model with gradient descent.
 
         Parameters
@@ -59,7 +59,7 @@ class LogisticRegression:
         """
 
         # Add a first dimension of ones corresponding to the intercept
-        x = np.hstack((np.ones([x.shape[0], 1]), x))
+        x = np.hstack((np.ones([X.shape[0], 1]), X))
 
         loss = []
         acc = []

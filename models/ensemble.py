@@ -58,7 +58,7 @@ class BaggingClassifier(Bagging):
         predictions = np.apply_along_axis(
                 lambda x: np.bincount(x).argmax(),
                 axis=1,
-                arr=predictions)
+                arr=predictions.astype(int))
 
         return predictions
 

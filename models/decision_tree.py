@@ -192,7 +192,7 @@ class DecisionTreeClassifier(DecisionTree):
     def _compute_leaf_value(self, y):
         # Return the most apearing label
         labels, counts = np.unique(y, return_counts=True)
-        return labels[np.argmax(counts)]
+        return int(labels[np.argmax(counts)])
 
     def _impurity_func(self, y):
         # Computes entropy as impurity
