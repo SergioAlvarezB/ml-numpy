@@ -200,48 +200,49 @@ class GradientBoostingClassifier(GradientBoosting):
                  min_loss=1e-5):
         super().__init__(base_model, learning_rate, max_models)
         self.min_loss = min_loss
-        self.update_steps = []
 
     def _loss(self, y, preds):
-        return -(y*np.log(preds) + (1-y)*np.log(1-preds))
+        return -np.mean(y*np.log(preds) + (1-y)*np.log(1-preds))
 
     def fit(self, X, y):
         self.initial_model = DummyRegressor(y, classification=True)
+        self.models = []
+        self.update_steps = []
+        loss = float('inf')
 
         for i in range(self.max_models):
             probs = self.predict_proba(X)
             grads = (1-probs)*(y + y-1)
 
-            loss = self._loss(y, probs)
+            loss, prev_loss = self._loss(y, probs), loss
+
+            if loss + self.min_loss >= prev_loss:
+                # Converged
+                break
 
             new_model = copy.deepcopy(self.base_model)
-            new_model.fit(grads)
+            new_model.fit(X, grads)
 
             # Estimate update step
             logits = self.predict_logits(X)
             rho = 0  # Update step
             preds = new_model.predict(X)
             probs = sigmoid(logits + rho*preds)
-
-            prev_loss = loss
-
+            steps = 0
+            curr_loss = loss
             while True:
-                descent_dir = (1-probs)*(y + y-1)*preds
-
-                probs = sigmoid(logits + (rho + 0.01*descent_dir)*preds)
+                descent_dir = np.mean((1-probs)*(y + y-1)*preds)
+                probs = sigmoid(logits + (rho + 0.1*descent_dir)*preds)
                 new_loss = self._loss(y, probs)
-                if new_loss >= loss:
+                if new_loss >= curr_loss:
                     break
                 else:
-                    rho += 0.01*descent_dir
-                    loss = new_loss
+                    rho += 0.1*descent_dir
+                    curr_loss = new_loss
+                    steps += 1
 
             self.models.append(new_model)
             self.update_steps.append(rho)
-
-            if loss + self.min_loss <= prev_loss:
-                # Converged
-                break
 
     def predict_logits(self, X):
         predictions = self.initial_model.predict(X)
@@ -255,7 +256,7 @@ class GradientBoostingClassifier(GradientBoosting):
     def predict_proba(self, X):
         predictions = self.predict_logits(X)
         # Logistic function.
-        return sigmoid(-predictions)
+        return sigmoid(predictions)
 
     def predict(self, X):
         return np.round(self.predict_proba(X))
